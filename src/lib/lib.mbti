@@ -1,0 +1,26 @@
+package username/hello/lib
+
+// Values
+fn hello() -> String
+
+fn make[V]() -> (Promise[V], Resolver[V])
+
+// Types and methods
+type Promise
+impl Promise {
+  state[V](Self[V]) -> State[V]
+  then[A, B](Self[A], (A) -> Self[B]) -> Self[B]
+}
+
+type Resolver
+impl Resolver {
+  fullfill[V](Self[V], V) -> Unit
+  reject[V](Self[V], Error) -> Unit
+}
+
+type State
+
+// Type aliases
+
+// Traits
+
