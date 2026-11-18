@@ -1,0 +1,24 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "username/hello/lib"
+
+// Values
+pub fn hello() -> String
+
+pub fn[V] make() -> (Promise[V], Resolver[V])
+
+// Errors
+
+// Types and methods
+type Promise[V]
+pub fn[V] Promise::state(Self[V]) -> State[V]
+pub fn[A, B] Promise::then(Self[A], (A) -> Self[B]) -> Self[B]
+
+type Resolver[V]
+pub fn[V] Resolver::fullfill(Self[V], V) -> Unit
+pub fn[V] Resolver::reject(Self[V], Error) -> Unit
+
+type State[V]
+
+// Type aliases
+
+// Traits

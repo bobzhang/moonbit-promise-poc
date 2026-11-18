@@ -12,34 +12,34 @@ struct Promise[V] {
 }
 
 ///|
-fn enqueue[V](self : Promise[V], handler : Handler[V]) -> Unit {
+fn[V] Promise::enqueue(self : Promise[V], handler : Handler[V]) -> Unit {
   self.handlers.push(handler)
 }
 
 ///|
-pub fn make[V]() -> (Promise[V], Resolver[V]) {
-  let p : Promise[V] = { state: Pending, handlers: [] }
-  (p, p)
+pub fn[V] make() -> (Promise[V], Resolver[V]) {
+  let p : Promise[V] = { state: Pending, handlers: [], }
+  (p, Resolver(p))
 }
 
 ///|
-pub fn state[V](self : Promise[V]) -> State[V] {
+pub fn[V] Promise::state(self : Promise[V]) -> State[V] {
   self.state
 }
 
 ///|
-pub fn then[A, B](
+pub fn[A, B] Promise::then(
   self : Promise[A],
-  callback : (A) -> Promise[B]
+  callback : (A) -> Promise[B],
 ) -> Promise[B] {
   match self.state {
     Fullfilled(value) => callback(value)
-    Rejected(error) => { state: Rejected(error), handlers: [] }
+    Rejected(error) => { state: Rejected(error), handlers: [], }
     Pending => {
       let (p, r) = make()
-      self.enqueue(
-        fn {
-          Pending => ...
+      self.enqueue(fn(state) {
+        match state {
+          Pending => abort("pending promise handler")
           Rejected(error) => r.reject(error)
           Fullfilled(value) => {
             let p = callback(value)
@@ -47,17 +47,17 @@ pub fn then[A, B](
               Fullfilled(value) => r.fullfill(value)
               Rejected(error) => r.reject(error)
               Pending =>
-                p.enqueue(
-                  fn {
-                    Pending => ...
+                p.enqueue(fn(state) {
+                  match state {
+                    Pending => abort("pending promise handler")
                     Rejected(error) => r.reject(error)
                     Fullfilled(value) => r.fullfill(value)
-                  },
-                )
+                  }
+                })
             }
           }
-        },
-      )
+        }
+      })
       p
     }
   }
